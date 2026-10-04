@@ -1,0 +1,448 @@
+{
+  "name": "AI LEAD QUALIIFICATION",
+  "nodes": [
+    {
+      "parameters": {
+        "formTitle": "panna jewellers-jewellery enquriy",
+        "formDescription": "looking for something special?",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "phone number",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "email",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "jeweller type",
+              "fieldType": "dropdown",
+              "fieldOptions": {
+                "values": [
+                  {
+                    "option": "Gold"
+                  },
+                  {
+                    "option": "Silver "
+                  },
+                  {
+                    "option": "Diamond"
+                  }
+                ]
+              },
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "jewellery requirement",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "message",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "budget",
+              "requiredField": true
+            },
+            {
+              "fieldLabel": "Customer name",
+              "requiredField": true
+            }
+          ]
+        },
+        "options": {
+          "path": "lead-enquiry"
+        }
+      },
+      "id": "3392787c-e709-4b24-93f9-29fa06172819",
+      "name": "Customer Enquiry Form",
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.6,
+      "position": [
+        -384,
+        176
+      ],
+      "webhookId": "8cd8eb30-47c9-44e1-bb90-f27e8bbcb73f"
+    },
+    {
+      "parameters": {
+        "text": "=Analyze this customer enquiry and qualify the lead. Identify the product they want, their budget, purchase timeline, and whether they are a hot, warm, or cold lead.\n",
+        "attributes": {
+          "attributes": [
+            {
+              "name": "product",
+              "description": "The product the customer wants to buy",
+              "required": true
+            },
+            {
+              "name": "budget",
+              "type": "number",
+              "description": "The customer's stated budget for the purchase",
+              "required": true
+            },
+            {
+              "name": "purchase_timeline",
+              "description": "When the customer plans to buy (e.g. \"immediately\", \"within 2 weeks\", \"next quarter\"). Use \"Unspecified\" if not stated.",
+              "required": true
+            },
+            {
+              "name": "lead_score",
+              "type": "number",
+              "description": "Lead qualification score from 0 to 100 based on purchase intent, budget, and timeline",
+              "required": true
+            },
+            {
+              "name": "classification",
+              "description": "Classify the lead as Hot, Warm, or Cold based on the score",
+              "required": true
+            },
+            {
+              "name": "customer_name",
+              "description": "Priya sharma ",
+              "required": true
+            },
+            {
+              "name": "Email",
+              "description": "Priya.sharma@gmail.com",
+              "required": true
+            },
+            {
+              "name": "Customer_details",
+              "description": "I want to buy gold ring for 250000 for anniversary this weekend "
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "53579b0e-cb67-47eb-88aa-1edf0922c60f",
+      "name": "Qualify Lead",
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        240,
+        -144
+      ]
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-5-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "id": "9cfd0e1d-904c-444a-8034-fafb11beb887",
+      "name": "OpenAI Chat Model",
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        160,
+        336
+      ],
+      "credentials": {
+        "openAiApi": {
+          "id": null,
+          "name": "Gateway credits",
+          "__aiGatewayManaged": true
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "customer_name",
+              "type": "string",
+              "value": "={{ $json.output.customer_name }}"
+            },
+            {
+              "id": "a2",
+              "name": "email",
+              "type": "string",
+              "value": "={{ $json.output.Email }}"
+            },
+            {
+              "id": "a3",
+              "name": "product",
+              "type": "string",
+              "value": "={{ $json.output.product }}"
+            },
+            {
+              "id": "a4",
+              "name": "budget",
+              "type": "string",
+              "value": "={{ $json.output.budget }}"
+            },
+            {
+              "id": "a5",
+              "name": "purchase_timeline",
+              "type": "string",
+              "value": "={{ $json.output.purchase_timeline }}"
+            },
+            {
+              "id": "a6",
+              "name": "lead_score",
+              "type": "number",
+              "value": "={{ $json.output.lead_score }}"
+            },
+            {
+              "id": "a7",
+              "name": "classification",
+              "type": "string",
+              "value": "={{ $json.output.classification }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "6eb3cafc-3f71-48bc-86d3-e7e54c0d70d1",
+      "name": "Format Qualified Lead",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        608,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "51a3c624-724d-4d2d-9ea6-22d321beae01",
+              "leftValue": "={{$json.lead_score}}",
+              "rightValue": 70,
+              "operator": {
+                "type": "number",
+                "operation": "gte"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        800,
+        112
+      ],
+      "id": "31c9e1dc-ee1e-4f94-8f04-f46b683461cf",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "48cd7be3-9ca4-45e2-afb7-0decaeaef947",
+              "name": "customer_name",
+              "value": "={{ $json.customer_name }}",
+              "type": "string"
+            },
+            {
+              "id": "9e46ac50-df0c-4f7e-9e54-63bf307dc529",
+              "name": "email",
+              "value": "={{ $json.email }}",
+              "type": "string"
+            },
+            {
+              "id": "e8362b7b-43ee-4c93-b5c3-a69aec06f6b4",
+              "name": "product",
+              "value": "={{ $json.product }}",
+              "type": "string"
+            },
+            {
+              "id": "fdec2844-5316-420a-89b3-68f0d8a4b0df",
+              "name": "budget",
+              "value": "={{ $json.budget }}",
+              "type": "string"
+            },
+            {
+              "id": "3eb1588a-1ef1-4495-afc9-70c75b4c297c",
+              "name": "purchase_timeline",
+              "value": "={{ $json.purchase_timeline }}",
+              "type": "string"
+            },
+            {
+              "id": "7e08beff-b557-49bc-9255-64de997d46af",
+              "name": "lead_score",
+              "value": "={{ $json.lead_score }}",
+              "type": "string"
+            },
+            {
+              "id": "a58ab087-b54c-4227-939d-8da743254cf4",
+              "name": "classification",
+              "value": "={{ $json.classification }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        1328,
+        240
+      ],
+      "id": "a2f250b9-2ef2-40ef-8771-0262724bd59d",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "sendTo": "vermawork12@gmail.com",
+        "subject": "new jewellery lead-panna jewellers",
+        "message": "=new customer enquiry -panna jewellers \n {{ $json.customer_name }}\n{{ $json.email }}\n{{ $json.product }}\n{{ $json.purchase_timeline }}\n{{ $json.budget }}\n{{ $json.classification }}\n{{ $json.lead_score }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        1664,
+        -48
+      ],
+      "id": "91a7cf5c-f665-45a1-9126-2b69446a585b",
+      "name": "Send a message",
+      "webhookId": "a74f9d94-aa68-4eaa-bd36-5bb9cbdeae05",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "CdPqWcYL9jFBZ0n3",
+          "name": "Gmail account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://jsonplaceholder.typicode.com/posts",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [
+            {
+              "name": "Name",
+              "value": "Priya sharma "
+            },
+            {
+              "name": "Email ",
+              "value": "priya@example.com"
+            },
+            {
+              "name": "Enquiry ",
+              "value": "I'm looking for a gaming laptop under $1500 and want to buy within the next 2 weeks."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.5,
+      "position": [
+        -224,
+        -112
+      ],
+      "id": "7886ad1a-bc1f-41de-ad43-6e18737b50de",
+      "name": "HTTP Request1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Customer Enquiry Form": {
+      "main": [
+        [
+          {
+            "node": "Qualify Lead",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qualify Lead": {
+      "main": [
+        [
+          {
+            "node": "Format Qualified Lead",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Qualify Lead",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Format Qualified Lead": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "28e7e70f-46ef-4de8-a14a-6d728a1da8cc",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "68a6886de13a45342a0e012674d4c4a355c93b5e1569212cb3b4765092d24276"
+  },
+  "nodeGroups": [],
+  "id": "1cnUgISRBT0a2yE9",
+  "tags": []
+}
